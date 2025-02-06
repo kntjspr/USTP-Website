@@ -140,8 +140,9 @@ export default function Home() {
                 <section className="cta" data-aos="fade-up">
                     <h1>CTA</h1>
                 </section>
+                <Footer />
+
             </main>
-            <Footer />
         </>
     );
 }

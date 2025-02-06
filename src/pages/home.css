@@ -1,6 +1,7 @@
 * {
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
     font-family: 'Google-Sans', 'Open sans', sans-serif, Arial;
 }
 
@@ -8,10 +9,21 @@ body {
     font-family: 'Google-Sans';
     color: #383838;
     font-weight: 500;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+    position: relative;
 }
 
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+main {
+    min-height: calc(100vh - 60px); /* Adjust based on your header height */
+    width: 100%;
+    position: relative;
 }
 
 /* Custom font face */
