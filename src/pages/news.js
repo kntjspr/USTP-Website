@@ -29,6 +29,8 @@ export default function News() {
         height: window.innerHeight
     });
 
+    const isMobile = windowSize.width <= 768;
+
     // Get the previous path from location state
     const previousPath = location.state?.from || '/';
 
@@ -55,7 +57,7 @@ export default function News() {
         fromHero: {
             // Already at center position
             left: '50%',
-            top: '50%',
+            top: isMobile ? '30%' : '50%',
             width: `${targetSize}px`,
             height: `${targetSize}px`,
         },
@@ -69,7 +71,7 @@ export default function News() {
         final: {
             // Final center position
             left: '50%',
-            top: '50%',
+            top: isMobile ? '30%' : '50%',
             width: `${targetSize}px`,
             height: `${targetSize}px`,
         }
@@ -273,14 +275,14 @@ export default function News() {
             <NavigationBar />
             <main>
                 {/* Hero Section with Transition */}
-                <header className="banner" style={{ 
-                    height: bannerHeight, 
-                    transition: comingFromHeroPage ? 'none' : 'height 0.8s ease-in-out' 
+                <header className="banner" style={{
+                    height: bannerHeight,
+                    transition: comingFromHeroPage ? 'none' : 'height 0.8s ease-in-out'
                 }}>
 
                     {/* Conditional Banner Circles - Only show initial circles when coming from non-hero pages */}
                     {!comingFromHeroPage && (
-                        <motion.div 
+                        <motion.div
                             variants={bannerContentVariants}
                             initial="visible"
                             animate="hidden"
@@ -298,8 +300,8 @@ export default function News() {
                     )}
 
                     {/* Hero Circles - Always present for news page */}
-                    <motion.div 
-                        className="hero-circles" 
+                    <motion.div
+                        className="hero-circles"
                         variants={heroElementsVariants}
                         initial="hidden"
                         animate="visible"
@@ -321,14 +323,14 @@ export default function News() {
                     </motion.div>
 
                     {/* Red Circle (circle-7 - Main transitioning circle) */}
-                    <motion.div 
+                    <motion.div
                         variants={circleVariants}
                         initial={getInitialVariant()}
                         animate="final"
-                        transition={{ 
-                            duration: 1.2, 
+                        transition={{
+                            duration: 1.2,
                             ease: [0.25, 0.46, 0.45, 0.94], // Custom easing for smooth motion
-                            type: "tween" 
+                            type: "tween"
                         }}
                         style={{
                             position: 'absolute',
@@ -340,17 +342,29 @@ export default function News() {
                     ></motion.div>
 
                     {/* New Hero Title "News" */}
-                    <motion.div 
+                    <motion.div
                         variants={heroElementsVariants}
                         initial="hidden"
                         animate="visible"
-                        style={{ position: 'absolute', zIndex: 10 }}
+                        style={{
+                            position: 'absolute',
+                            zIndex: 10,
+                            top: isMobile ? '30%' : '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)'
+                        }}
                     >
-                        <h1 style={{ color: 'white', fontSize: '5rem', fontWeight: '700', margin: 0 }}>News</h1>
+                        <h1 style={{ color: 'white', fontSize: isMobile ? '3rem' : '5rem', fontWeight: '700', margin: 0 }}>News</h1>
                     </motion.div>
                 </header>
 
-                <section className="news-container" ref={contentRef}>
+                <section className="news-container" ref={contentRef} style={{
+                    marginTop: isMobile ? '-40vh' : '0',
+                    position: 'relative',
+                    zIndex: 2,
+                    backgroundColor: isMobile ? '#F5F5F5' : 'transparent',
+                    borderRadius: isMobile ? '30px 30px 0 0' : '0'
+                }}>
                     <div className="whats-new-section">
                         <h2>What's New</h2>
 

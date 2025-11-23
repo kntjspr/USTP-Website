@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import NavigationBar from '../components/navBar';
 import Footer from '../components/footer';
 import HeroSection from '../components/HeroSection';
@@ -8,28 +8,37 @@ import './meetTheTeam.css';
 export default function MeetTheTeam() {
     const [selectedGroup, setSelectedGroup] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
-    
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const groups = getAllGroups();
     const teamByGroup = getTeamByGroup();
-    
+
     // Filter logic
     const filteredTeam = useMemo(() => {
         let filtered = teamMembers;
-        
+
         // Filter by group
         if (selectedGroup !== 'All') {
             filtered = filtered.filter(member => member.group === selectedGroup);
         }
-        
+
         // Filter by search query
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase();
-            filtered = filtered.filter(member => 
+            filtered = filtered.filter(member =>
                 member.name.toLowerCase().includes(query) ||
                 member.role.toLowerCase().includes(query)
             );
         }
-        
+
         // Group the filtered results
         const grouped = {};
         filtered.forEach(member => {
@@ -38,25 +47,31 @@ export default function MeetTheTeam() {
             }
             grouped[member.group].push(member);
         });
-        
+
         // Sort within groups
         Object.keys(grouped).forEach(group => {
             grouped[group].sort((a, b) => a.order - b.order);
         });
-        
+
         return grouped;
     }, [selectedGroup, searchQuery]);
-    
+
     const totalMembers = Object.values(filteredTeam).reduce((sum, members) => sum + members.length, 0);
-    
+
     return (
         <>
             <title>Meet the Team</title>
             <NavigationBar />
-            
+
             <HeroSection title="About us" theme="aboutus" />
-            
-            <section className="meet-team-page">
+
+            <section className="meet-team-page" style={{
+                marginTop: isMobile ? '-40vh' : '0',
+                position: 'relative',
+                zIndex: 2,
+                backgroundColor: isMobile ? '#F5F5F5' : 'transparent',
+                borderRadius: isMobile ? '30px 30px 0 0' : '0'
+            }}>
                 <div className="meet-team-container">
                     {/* Filter Controls */}
                     <div className="team-filters">
@@ -70,7 +85,7 @@ export default function MeetTheTeam() {
                                 aria-label="Search team members"
                             />
                         </div>
-                        
+
                         <div className="filter-buttons">
                             <button
                                 className={`filter-btn ${selectedGroup === 'All' ? 'active all-teams-btn-color' : ''}`}
@@ -91,7 +106,7 @@ export default function MeetTheTeam() {
                             ))}
                         </div>
                     </div>
-                    
+
                     {/* Team Groups */}
                     {Object.keys(filteredTeam).length > 0 ? (
                         Object.entries(filteredTeam).map(([groupName, members]) => (
@@ -101,12 +116,12 @@ export default function MeetTheTeam() {
                                     {members.map(member => {
                                         const groupColor = getGroupColor(member.group);
                                         return (
-                                            <div 
-                                                key={member.id} 
+                                            <div
+                                                key={member.id}
                                                 className="team-card"
                                                 style={{ borderColor: groupColor }}
                                             >
-                                                <div 
+                                                <div
                                                     className="team-card-image"
                                                     style={{
                                                         backgroundImage: `url(${encodeURI(member.image)})`,
@@ -117,18 +132,18 @@ export default function MeetTheTeam() {
                                                     role="img"
                                                     aria-label={member.alt}
                                                 >
-                                                    <img 
-                                                        src={encodeURI(member.image)} 
+                                                    <img
+                                                        src={encodeURI(member.image)}
                                                         alt={member.alt}
                                                         loading="lazy"
-                                                        style={{ 
-                                                            width: '1px', 
-                                                            height: '1px', 
-                                                            opacity: 0 
-                                                        }} 
+                                                        style={{
+                                                            width: '1px',
+                                                            height: '1px',
+                                                            opacity: 0
+                                                        }}
                                                     />
                                                 </div>
-                                                <div 
+                                                <div
                                                     className="team-card-info"
                                                     style={{ backgroundColor: groupColor }}
                                                 >
@@ -148,7 +163,7 @@ export default function MeetTheTeam() {
                     )}
                 </div>
             </section>
-            
+
             <Footer />
         </>
     );

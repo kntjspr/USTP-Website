@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import NavigationBar from "../components/navBar";
 import Footer from "../components/footer";
 import HeroSection from "../components/HeroSection";
-import './events.css'; 
+import './events.css';
 import './main.css'
 import Sample from '../assets/sample.png';
 
@@ -18,6 +18,15 @@ export default function Events() {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         AOS.init();
@@ -42,20 +51,20 @@ export default function Events() {
             }
 
             const data = await response.json();
-            
+
             // Separate events based on their status
-            const upcomingEvents = data.filter(event => 
+            const upcomingEvents = data.filter(event =>
                 event.status === "Upcoming"
             );
-            
-            const completedEvents = data.filter(event => 
+
+            const completedEvents = data.filter(event =>
                 event.status === "Completed"
             );
-            
-            const cancelledEvents = data.filter(event => 
+
+            const cancelledEvents = data.filter(event =>
                 event.status === "Cancelled"
             );
-            
+
             setEvents({
                 upcomingEvents,
                 completedEvents,
@@ -72,16 +81,16 @@ export default function Events() {
     // Function to calculate and format countdown
     const getCountdown = (eventDate) => {
         if (!eventDate) return 'Date not specified';
-        
+
         const now = new Date();
         const event = new Date(eventDate);
         const diffTime = event - now;
-        
+
         if (diffTime < 0) return 'Event has passed';
-        
+
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
         const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        
+
         if (diffDays > 0) {
             return `${diffDays} day${diffDays !== 1 ? 's' : ''} ${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
         } else if (diffHours > 0) {
@@ -94,25 +103,25 @@ export default function Events() {
     // Function to format date nicely
     const formatDate = (dateString) => {
         if (!dateString) return 'Date not specified';
-        
+
         try {
             const date = new Date(dateString);
-            
-            const dateOptions = { 
+
+            const dateOptions = {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             };
-            
+
             const timeOptions = {
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: true
             };
-            
+
             const formattedDate = date.toLocaleDateString('en-US', dateOptions);
             const formattedTime = date.toLocaleTimeString('en-US', timeOptions);
-            
+
             return `Registration Ends at ${formattedDate} - ${formattedTime}`;
         } catch (e) {
             return 'Invalid date format';
@@ -149,8 +158,8 @@ export default function Events() {
                 {displayEvents.map(event => (
                     <div className="public-event-card" key={event.id} data-aos="fade-up">
                         <div className="public-event-image">
-                            <img 
-                                src={getImageUrl(event.image_url)} 
+                            <img
+                                src={getImageUrl(event.image_url)}
                                 alt={`${event.heading} thumbnail`}
                                 loading="lazy"
                             />
@@ -185,7 +194,13 @@ export default function Events() {
             <main>
                 <HeroSection title="Events" theme="events" />
 
-                <section className="public-events-container">
+                <section className="public-events-container" style={{
+                    marginTop: isMobile ? '-40vh' : '0',
+                    position: 'relative',
+                    zIndex: 2,
+                    backgroundColor: isMobile ? '#F5F5F5' : 'transparent',
+                    borderRadius: isMobile ? '30px 30px 0 0' : '0'
+                }}>
                     {loading ? (
                         <div className="public-loading-container">
                             <div className="public-loading-spinner"></div>
@@ -204,28 +219,28 @@ export default function Events() {
                                     {renderEventCards(events.upcomingEvents)}
                                 </div>
                             )}
-                            
+
                             {events.completedEvents.length > 0 && (
                                 <div className="public-events-section">
                                     <h2>Completed Events</h2>
                                     {renderEventCards(events.completedEvents)}
                                 </div>
                             )}
-                            
+
                             {events.cancelledEvents.length > 0 && (
                                 <div className="public-events-section">
                                     <h2>Cancelled Events</h2>
                                     {renderEventCards(events.cancelledEvents)}
                                 </div>
                             )}
-                            
-                            {events.upcomingEvents.length === 0 && 
-                             events.completedEvents.length === 0 && 
-                             events.cancelledEvents.length === 0 && (
-                                <div className="public-no-events-container">
-                                    <p>No events available at the moment. Check back soon!</p>
-                                </div>
-                             )}
+
+                            {events.upcomingEvents.length === 0 &&
+                                events.completedEvents.length === 0 &&
+                                events.cancelledEvents.length === 0 && (
+                                    <div className="public-no-events-container">
+                                        <p>No events available at the moment. Check back soon!</p>
+                                    </div>
+                                )}
                         </>
                     )}
                 </section>

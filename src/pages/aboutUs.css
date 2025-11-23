@@ -1744,12 +1744,14 @@
     box-sizing: border-box;
     width: 730px;
     height: 500px;
+    min-height: 400px;
     border: 2px solid #EDD0B0;
     border-radius: 60px;
     flex: 1;
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
+    object-fit: cover;
 }
 
 .technology-text-container {
@@ -1851,12 +1853,14 @@
     box-sizing: border-box;
     width: 730px;
     height: 500px;
+    min-height: 400px;
     border: 2px solid #EDD0B0;
     border-radius: 60px;
     flex: 1;
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
+    object-fit: cover;
 }
 
 .communications-text-container {
@@ -1958,12 +1962,14 @@
     box-sizing: border-box;
     width: 730px;
     height: 500px;
+    min-height: 400px;
     border: 2px solid #EDD0B0;
     border-radius: 60px;
     flex: 1;
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
+    object-fit: cover;
 }
 
 .community-relations-text-container {
@@ -2137,8 +2143,12 @@
     .technology-image,
     .communications-image,
     .community-relations-image {
-        height: 300px;
+        height: 300px !important;
+        min-height: 250px !important;
         border-radius: 30px;
+        background-position: center center !important;
+        background-size: cover !important;
+        background-repeat: no-repeat !important;
     }
 }
 
@@ -2179,7 +2189,8 @@
     .technology-image,
     .communications-image,
     .community-relations-image {
-        height: 220px;
+        height: 220px !important;
+        min-height: 200px !important;
     }
 }
 
