@@ -1,8 +1,8 @@
 /* Style sheet for Navigation Bar Component*/
 
 * {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 /* Navbar Container */
@@ -101,8 +101,13 @@ a[href="/team"].active {
 /* Dropdown Menu */
 .nav-dropdown {
   position: relative;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+}
+
+.nav-dropdown .nav-link {
+  text-align: center;
+  min-width: max-content;
 }
 
 .dropdown-menu {
@@ -201,11 +206,13 @@ body.menu-open {
   .navbar-content {
     padding: 0 16px;
   }
-  
+
   .navbar-logo {
-    margin-left: 8px;
+    margin-left: 0;
+    height: 28px;
+    width: auto;
   }
-  
+
   .navbar-links {
     position: fixed;
     flex-direction: column;
@@ -219,32 +226,32 @@ body.menu-open {
     z-index: 100;
     gap: 20px;
   }
-  
+
   .navbar-links.mobile-menu-active {
     right: 0;
   }
-  
+
   .hamburger {
     display: flex;
   }
-  
+
   .desktop-register {
     display: none;
   }
-  
+
   .mobile-register {
     display: block;
     width: 100%;
     margin-top: 20px;
   }
-  
+
   /* Mobile dropdown styles */
   .nav-dropdown {
     flex-direction: column;
     align-items: stretch;
     width: 100%;
   }
-  
+
   .dropdown-menu {
     position: static;
     opacity: 1;
@@ -256,7 +263,7 @@ body.menu-open {
     background-color: rgba(251, 193, 14, 0.05);
     border-radius: 8px;
   }
-  
+
   .dropdown-link {
     padding: 10px 20px;
     font-size: 14px;
@@ -267,11 +274,11 @@ body.menu-open {
   .navbar-content {
     padding: 0 20px;
   }
-  
+
   .navbar-logo {
-    margin-left: 12px;
+    height: 24px;
   }
-  
+
   .navbar-links {
     width: 100%;
     right: -100%;

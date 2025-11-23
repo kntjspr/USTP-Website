@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import './navBar.css'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import Logo from '../assets/logo.svg'
+import Logo from '../assets/logo.png'
+import Logo2x from '../assets/logo@2x.png'
+import Logo3x from '../assets/logo@3x.png'
 
 export default function NavigationBar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -48,7 +50,12 @@ export default function NavigationBar() {
             <div className="navbar-container">
                 <div className="navbar-content">
                     <NavLink to="/">
-                        <img src={Logo} className="navbar-logo" alt="GDG Logo" />
+                        <img
+                            src={Logo}
+                            srcSet={`${Logo2x} 2x, ${Logo3x} 3x`}
+                            className="navbar-logo"
+                            alt="GDG Logo"
+                        />
                     </NavLink>
 
                     <div className={`hamburger ${isMenuOpen ? 'open' : ''}`} onClick={toggleMenu}>

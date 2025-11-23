@@ -1,4 +1,4 @@
-*{
+* {
     margin: 0;
     padding: 0;
 }
@@ -442,8 +442,13 @@
 }
 
 @keyframes shimmer {
-    0% { left: -100%; }
-    100% { left: 100%; }
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
 }
 
 .loading-spinner {
@@ -472,8 +477,13 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .loading-container p {
@@ -486,8 +496,15 @@
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 1; }
+
+    0%,
+    100% {
+        opacity: 0.7;
+    }
+
+    50% {
+        opacity: 1;
+    }
 }
 
 /* Error state styling */
@@ -523,9 +540,19 @@
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
 }
 
 .error-container h3 {
@@ -598,17 +625,17 @@
         padding: 50px;
         max-width: 90%;
     }
-    
+
     .blog-post {
         height: auto;
         min-height: 400px;
     }
-    
+
     .post-image {
         flex: 0 0 45%;
         height: 400px;
     }
-    
+
     .post-content {
         height: auto;
     }
@@ -618,20 +645,20 @@
     .news-container {
         padding: 60px 40px 30px;
     }
-    
+
     .news-container h2 {
         font-size: 48px;
         line-height: 60px;
     }
-    
+
     .blog-post {
         gap: 30px;
     }
-    
+
     .post-content h3 {
         font-size: 36px;
     }
-    
+
     .post-description {
         font-size: 16px;
     }
@@ -755,7 +782,8 @@
         min-height: 48px;
         padding: 16px 32px;
         font-size: 16px;
-        touch-action: manipulation; /* Prevents double-tap zoom */
+        touch-action: manipulation;
+        /* Prevents double-tap zoom */
     }
 
     .blog-post {

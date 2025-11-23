@@ -18,10 +18,17 @@ body {
     font-family: 'Google-Sans';
     color: #383838;
     font-weight: 500;
+    width: 100%;
+    overflow-x: hidden;
+    position: relative;
+    -webkit-text-size-adjust: 100%;
 }
 
 html {
     scroll-behavior: smooth;
+    width: 100%;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
 }
 
 /* Custom font face */
@@ -71,6 +78,8 @@ html {
     background-color: white;
     position: relative;
     overflow: hidden;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
 }
 
 /* Add specific styling for mobile view */
@@ -78,7 +87,12 @@ html {
     .banner {
         height: auto;
         min-height: 100vh;
-        padding: 60px 0;
+        min-height: -webkit-fill-available;
+        padding: 60px 20px;
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+        padding-top: max(60px, env(safe-area-inset-top));
+        padding-bottom: max(60px, env(safe-area-inset-bottom));
     }
 }
 
@@ -297,12 +311,12 @@ html {
 
 @media screen and (max-width: 768px) {
     .banner-title {
-        font-size: 48px;
+        font-size: 40px;
         white-space: normal;
     }
 
     .banner p {
-        font-size: 22px;
+        font-size: 18px;
     }
 
     .circle1 {
@@ -341,11 +355,11 @@ html {
 
 @media screen and (max-width: 480px) {
     .banner-title {
-        font-size: 36px;
+        font-size: 32px;
     }
 
     .banner p {
-        font-size: 18px;
+        font-size: 16px;
     }
 
     .circle1 {
@@ -1584,14 +1598,10 @@ html {
     flex: 1;
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
 
-.home-text-container:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-}
+
 
 .right-aligned {
     text-align: right;

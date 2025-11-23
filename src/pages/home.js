@@ -13,9 +13,10 @@ import { useSpring, animated, config } from 'react-spring';
 
 
 export default function Home() {
-    const [showPageContent, setShowPageContent] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
-    const [isHeroVisible, setIsHeroVisible] = useState(false);
+    const [showPageContent, setShowPageContent] = useState(() => window.innerWidth <= 768);
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+    const [isHeroVisible, setIsHeroVisible] = useState(() => window.innerWidth <= 768);
+    const [scrollY, setScrollY] = useState(0);
     const [windowSize, setWindowSize] = useState({
         width: window.innerWidth,
         height: window.innerHeight
@@ -33,8 +34,9 @@ export default function Home() {
             setIsMobile(mobile);
 
             // Show content immediately on mobile
-            if (mobile && !showPageContent) {
-                setShowPageContent(true);
+            if (mobile) {
+                if (!showPageContent) setShowPageContent(true);
+                if (!isHeroVisible) setIsHeroVisible(true);
             }
 
             setWindowSize({
@@ -49,7 +51,17 @@ export default function Home() {
         // Add resize listener for mobile device
         window.addEventListener('resize', checkIsMobile);
         return () => window.removeEventListener('resize', checkIsMobile);
-    }, [showPageContent]);
+    }, [showPageContent, isHeroVisible]);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (isMobile) {
+                setScrollY(window.scrollY);
+            }
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [isMobile]);
 
     useEffect(() => {
         AOS.init();
@@ -98,11 +110,11 @@ export default function Home() {
     // Animation for the blue circle (circle1)
     const circleSpring = useSpring({
         to: isHeroVisible ? {
-            top: '50%',
+            top: isMobile ? '30%' : '50%',
             left: '50%',
             width: `${targetSize}px`,
             height: `${targetSize}px`,
-            transform: 'translate(-50%, -50%)',
+            transform: isMobile ? `translate(-50%, -50%) scale(${1 + scrollY * 0.0005})` : 'translate(-50%, -50%)',
             borderRadius: '50%',
             position: 'absolute',
             animation: 'none', // Disable CSS float animation to prevent conflict
@@ -133,6 +145,9 @@ export default function Home() {
     const heroTitleSpring = useSpring({
         opacity: isHeroVisible ? 1 : 0,
         transform: isHeroVisible ? 'translateY(0px)' : 'translateY(20px)',
+        top: isMobile ? '30%' : '50%', // Center with the circle
+        left: '50%',
+        transform: isMobile ? 'translate(-50%, -50%)' : 'translate(-50%, -50%)', // Center alignment
         delay: 200,
         config: config.molasses
     });
@@ -212,7 +227,7 @@ export default function Home() {
 
                     {/* New Hero Title "Home" */}
                     <animated.div style={{ ...heroTitleSpring, position: 'absolute', zIndex: 10 }}>
-                        <h1 style={{ color: 'white', fontSize: '5rem', fontWeight: '700', margin: 0 }}>Home</h1>
+                        <h1 style={{ color: 'white', fontSize: isMobile ? '3rem' : '5rem', fontWeight: '700', margin: 0 }}>Home</h1>
                     </animated.div>
                 </header>
 
@@ -222,7 +237,11 @@ export default function Home() {
                         ...contentProps,
                         display: !showPageContent && !isMobile ? 'none' : 'block',
                         position: !showPageContent && !isMobile ? 'absolute' : 'relative',
-                        visibility: !showPageContent && !isMobile ? 'hidden' : 'visible'
+                        visibility: !showPageContent && !isMobile ? 'hidden' : 'visible',
+                        marginTop: isMobile ? '-40vh' : '0',
+                        zIndex: 2,
+                        backgroundColor: isMobile ? '#F5F5F5' : 'transparent',
+                        borderRadius: isMobile ? '30px 30px 0 0' : '0'
                     }}
                     ref={contentRef}
                 >
@@ -392,15 +411,15 @@ export default function Home() {
                                 ) : latestNews.length > 0 ? (
                                     latestNews.map((post) => (
                                         <div key={post.id} className="wtsup-card">
-                                            <img 
-                                                src={post.image_url 
-                                                    ? (post.image_url.startsWith('http') 
-                                                        ? post.image_url 
+                                            <img
+                                                src={post.image_url
+                                                    ? (post.image_url.startsWith('http')
+                                                        ? post.image_url
                                                         : `https://yrvykwljzajfkraytbgr.supabase.co/storage/v1/object/public/blog-images/${post.image_url}`)
                                                     : About
-                                                } 
-                                                alt={post.heading} 
-                                                className="wtsup-image" 
+                                                }
+                                                alt={post.heading}
+                                                className="wtsup-image"
                                             />
                                             <div className="wtsup-content">
                                                 <div className="wtsup-header">
@@ -412,7 +431,7 @@ export default function Home() {
                                                             const diffTime = Math.abs(now - date);
                                                             const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
                                                             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                                                            
+
                                                             if (diffDays < 1) {
                                                                 if (diffHours < 1) {
                                                                     const diffMinutes = Math.floor(diffTime / (1000 * 60));
