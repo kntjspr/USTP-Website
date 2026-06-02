@@ -8,10 +8,12 @@ let supabase = null;
 function getSupabase() {
     if (!supabase) {
         const url = process.env.SUPABASE_URL || process.env.REACT_APP_SUPABASE_URL;
-        const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY;
+        // Anon-key path only. Writes are RLS-protected (admin-only).
+        // Service-role usage is centralized in handlers that need to bypass RLS.
+        const key = process.env.SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY;
 
         if (!url || !key) {
-            console.error('Missing SUPABASE_URL or key');
+            console.error('Missing SUPABASE_URL or SUPABASE_ANON_KEY');
             return null;
         }
 
