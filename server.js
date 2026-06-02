@@ -6,12 +6,24 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Increase header size limits
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ limit: '1mb', extended: true }));
 
-// Middleware
-app.use(cors());
+const ALLOWED_ORIGINS = [
+    'https://gdgustp.com',
+    'https://www.gdgustp.com',
+    `http://localhost:${PORT}`,
+    'http://localhost:3000',
+    'http://localhost:5000'
+];
+
+app.use(cors({
+    origin: (origin, cb) => {
+        if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+        return cb(new Error('Origin not allowed by CORS'));
+    },
+    credentials: false
+}));
 
 // Serve static files from build directory
 app.use(express.static(path.join(__dirname, 'build')));
