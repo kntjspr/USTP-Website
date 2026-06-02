@@ -1,13 +1,13 @@
 /**
  * Centralized TinyMCE configuration
- * This allows us to maintain TinyMCE settings in one place
- * API key is now fetched securely from server-side API
+ * API key is fetched from an authenticated server-side endpoint.
  */
+import { supabase } from './supabase';
 
 let cachedConfig = null;
 
 /**
- * Fetch TinyMCE configuration from secure API endpoint
+ * Fetch TinyMCE configuration from auth-gated API endpoint
  */
 export const getTinyMCEConfig = async () => {
     if (cachedConfig) {
@@ -15,7 +15,12 @@ export const getTinyMCEConfig = async () => {
     }
 
     try {
-        const response = await fetch('/api/tinymce-config');
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+
+        const response = await fetch('/api/tinymce-config', {
+            headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
         if (!response.ok) {
             throw new Error(`Failed to fetch TinyMCE config: ${response.statusText}`);
         }
