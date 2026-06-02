@@ -1,6 +1,7 @@
-// Import the personality code validation function
-// Note: In serverless environment, we need to inline this function
-// to avoid import issues with the src directory structure
+import { rateLimit } from './_rate-limit.js';
+
+// Personality code validation is inlined below — in this serverless
+// runtime, importing from the src directory is unreliable.
 
 /**
  * Valid letters for each position in the 10-character personality code
@@ -133,6 +134,10 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
+
+    // Gemini calls cost money — cap per-IP to block cost amplification
+    const limit = rateLimit({ windowMs: 60_000, max: 10, keyPrefix: 'personality' });
+    if (!limit(req, res).allowed) return;
 
     if (!GEMINI_API_KEY) {
         console.error('Gemini API key is not configured');

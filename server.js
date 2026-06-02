@@ -1,10 +1,30 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Trust X-Forwarded-For from Vercel / reverse proxy so rate limit keys
+// off the real client IP. Single hop — keep this tight.
+app.set('trust proxy', 1);
+
+const registrationLimiter = rateLimit({
+    windowMs: 60_000,
+    max: 3,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests' }
+});
+const personalityLimiter = rateLimit({
+    windowMs: 60_000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests' }
+});
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ limit: '1mb', extended: true }));
@@ -29,7 +49,7 @@ app.use(cors({
 app.use(express.static(path.join(__dirname, 'build')));
 
 // API Routes - Handle ES6 modules properly
-app.post('/api/analyze-personality', async (req, res) => {
+app.post('/api/analyze-personality', personalityLimiter, async (req, res) => {
     try {
         console.log('API request received:', {
             method: req.method,
@@ -102,7 +122,7 @@ app.all('/api/settings', async (req, res) => {
 });
 
 // Registrations API
-app.all('/api/registrations', async (req, res) => {
+app.all('/api/registrations', (req, res, next) => req.method === 'POST' ? registrationLimiter(req, res, next) : next(), async (req, res) => {
     try {
         const { default: handler } = await import('./api/registrations.js');
         await handler(req, res);

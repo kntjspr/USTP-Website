@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { rateLimit } from './_rate-limit.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
@@ -93,8 +94,11 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    // POST - submit new registration
+    // POST - submit new registration (anonymous, rate-limited)
     if (req.method === 'POST') {
+        const limit = rateLimit({ windowMs: 60_000, max: 3, keyPrefix: 'reg_post' });
+        if (!limit(req, res).allowed) return;
+
         try {
             const {
                 registration_type,
