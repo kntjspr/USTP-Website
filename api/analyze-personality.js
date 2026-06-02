@@ -1,6 +1,7 @@
-// Import the personality code validation function
-// Note: In serverless environment, we need to inline this function
-// to avoid import issues with the src directory structure
+import { rateLimit } from './_rate-limit.js';
+
+// Personality code validation is inlined below — in this serverless
+// runtime, importing from the src directory is unreliable.
 
 /**
  * Valid letters for each position in the 10-character personality code
@@ -125,12 +126,6 @@ K	Planner	Studies first, thinks before acting or testing
 `;
 
 export default async function handler(req, res) {
-    // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    // Handle preflight requests
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
@@ -140,14 +135,13 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // Check if API key is configured
+    // Gemini calls cost money — cap per-IP to block cost amplification
+    const limit = rateLimit({ windowMs: 60_000, max: 10, keyPrefix: 'personality' });
+    if (!limit(req, res).allowed) return;
+
     if (!GEMINI_API_KEY) {
         console.error('Gemini API key is not configured');
-        console.error('Environment variables available:', Object.keys(process.env).filter(key => key.includes('GEMINI') || key.includes('API')));
-        return res.status(500).json({
-            error: 'Server configuration error',
-            debug: process.env.NODE_ENV || 'unknown'
-        });
+        return res.status(500).json({ error: 'Server configuration error' });
     }
 
     try {

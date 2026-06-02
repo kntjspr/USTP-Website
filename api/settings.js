@@ -10,10 +10,6 @@ const supabaseAdmin = SUPABASE_SERVICE_KEY
     : null;
 
 export default async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
@@ -51,13 +47,31 @@ export default async function handler(req, res) {
 
     // PUT - update setting (admin only)
     if (req.method === 'PUT') {
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
         if (!supabaseAdmin) {
             return res.status(500).json({ error: 'Admin client not configured' });
+        }
+
+        const token = req.headers.authorization?.startsWith('Bearer ')
+            ? req.headers.authorization.substring(7)
+            : null;
+
+        if (!token) {
+            return res.status(401).json({ error: 'Unauthorized - Missing token' });
+        }
+
+        const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+        if (authError || !user) {
+            return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+        }
+
+        const { data: profile, error: profileError } = await supabaseAdmin
+            .from('users')
+            .select('permission')
+            .eq('id', user.id)
+            .single();
+
+        if (profileError || !profile || !['ADMIN', 'SYSTEM'].includes(profile.permission)) {
+            return res.status(403).json({ error: 'Forbidden - Insufficient privileges' });
         }
 
         if (!key) {

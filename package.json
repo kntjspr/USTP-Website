@@ -20,6 +20,7 @@
     "dompurify": "^3.3.1",
     "dotenv": "^17.2.1",
     "express": "^4.21.2",
+    "express-rate-limit": "^8.5.2",
     "framer-motion": "^12.23.24",
     "node-fetch": "^3.3.2",
     "react": "^18.3.1",
@@ -37,7 +38,9 @@
   },
   "proxy": "http://localhost:3001",
   "scripts": {
-    "dev": "react-scripts start",
+    "tailwind": "@tailwindcss/cli -i ./src/index.css -o ./src/tailwind-output.css --minify",
+    "prebuild": "npm run tailwind",
+    "dev": "concurrently \"@tailwindcss/cli -i ./src/index.css -o ./src/tailwind-output.css --watch\" \"react-scripts start\"",
     "server": "PORT=3001 bun run server.js",
     "dev:full": "concurrently \"npm run server\" \"npm run dev\"",
     "build": "react-scripts build",
@@ -45,7 +48,7 @@
     "serve:prod": "bun run server.js",
     "test": "react-scripts test",
     "vercel-build": "npm run build:vercel",
-    "build:vercel": "cross-env CI=false DISABLE_ESLINT_PLUGIN=true react-scripts build"
+    "build:vercel": "npm run tailwind && cross-env CI=false DISABLE_ESLINT_PLUGIN=true react-scripts build"
   },
   "eslintConfig": {
     "extends": [
@@ -66,6 +69,7 @@
     ]
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.2.1",
     "autoprefixer": "^10.4.23",
     "concurrently": "^9.2.1",
     "cross-env": "^10.0.0",
