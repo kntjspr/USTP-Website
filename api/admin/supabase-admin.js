@@ -36,6 +36,17 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Unauthorized - Invalid token' });
     }
 
+    // Verify the user has ADMIN or SYSTEM permission in the users table
+    const { data: profile, error: profileError } = await supabaseAdmin
+        .from('users')
+        .select('permission')
+        .eq('id', user.id)
+        .single();
+
+    if (profileError || !profile || !['ADMIN', 'SYSTEM'].includes(profile.permission)) {
+        return res.status(403).json({ error: 'Forbidden - Insufficient privileges' });
+    }
+
     const ALLOWED_TABLES = ['users', 'blog_posts', 'events', 'registrations', 'short_urls'];
 
     try {
