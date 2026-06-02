@@ -23,17 +23,30 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Server configuration error' });
     }
 
-    // Basic authentication check (you should implement proper auth)
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const token = req.headers.authorization?.startsWith('Bearer ')
+        ? req.headers.authorization.substring(7)
+        : null;
+
+    if (!token) {
         return res.status(401).json({ error: 'Unauthorized - Missing or invalid token' });
     }
+
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    if (authError || !user) {
+        return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+    }
+
+    const ALLOWED_TABLES = ['users', 'blog_posts', 'events', 'registrations', 'short_urls'];
 
     try {
         const { action, table, data, filters, id } = req.body;
 
         if (!action || !table) {
             return res.status(400).json({ error: 'Action and table are required' });
+        }
+
+        if (!ALLOWED_TABLES.includes(table)) {
+            return res.status(403).json({ error: 'Access to this table is not allowed' });
         }
 
         let result;
