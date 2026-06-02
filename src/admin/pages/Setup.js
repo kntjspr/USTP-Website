@@ -123,7 +123,9 @@ export default function Setup() {
 
             console.log('Auth account created:', authData);
 
-            // Create user profile with SYSTEM permission
+            // Create user profile with SYSTEM permission.
+            // Allowed by the users_insert_bootstrap RLS policy because the
+            // users table is empty during first-time setup.
             const { error: profileError } = await supabase
                 .from('users')
                 .insert([{
@@ -132,8 +134,7 @@ export default function Setup() {
                     email: formData.email,
                     position: formData.position,
                     address: formData.address,
-                    permission: 'SYSTEM',
-                    password: '' // We don't store the actual password
+                    permission: 'SYSTEM'
                 }]);
 
             if (profileError) {
