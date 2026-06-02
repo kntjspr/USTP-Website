@@ -17,6 +17,22 @@ const DEPARTMENTS = [
     'Community Development'
 ];
 
+function escHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+}
+
+function safeHref(s) {
+    try {
+        const u = new URL(String(s ?? ''));
+        if (u.protocol !== 'http:' && u.protocol !== 'https:') return '#';
+        return escHtml(u.toString());
+    } catch {
+        return '#';
+    }
+}
+
 async function sendEmailNotification(registration) {
     if (!RESEND_API_KEY) {
         console.warn('RESEND_API_KEY not configured, skipping email notification');
@@ -30,19 +46,19 @@ async function sendEmailNotification(registration) {
             <img src="https://gdgustp.com/devy-mail.png" alt="GDG USTP" style="max-width: 100%; height: auto; border-radius: 8px;" />
         </div>
         <h2>New ${isCoreteam ? 'Core Team' : 'Member'} Registration</h2>
-        <p><strong>Name:</strong> ${registration.full_name}</p>
-        <p><strong>Email:</strong> ${registration.email}</p>
-        <p><strong>Student ID:</strong> ${registration.student_id}</p>
-        <p><strong>Year Level:</strong> ${registration.year_level}</p>
+        <p><strong>Name:</strong> ${escHtml(registration.full_name)}</p>
+        <p><strong>Email:</strong> ${escHtml(registration.email)}</p>
+        <p><strong>Student ID:</strong> ${escHtml(registration.student_id)}</p>
+        <p><strong>Year Level:</strong> ${escHtml(registration.year_level)}</p>
         ${isCoreteam ? `
         <hr>
         <h3>Core Team Details</h3>
-        <p><strong>Primary Department:</strong> ${registration.primary_department}</p>
-        <p><strong>Secondary Department:</strong> ${registration.secondary_department}</p>
-        <p><strong>CV Link:</strong> <a href="${registration.cv_link}">${registration.cv_link}</a></p>
-        ${registration.github_link ? `<p><strong>GitHub:</strong> <a href="${registration.github_link}">${registration.github_link}</a></p>` : ''}
+        <p><strong>Primary Department:</strong> ${escHtml(registration.primary_department)}</p>
+        <p><strong>Secondary Department:</strong> ${escHtml(registration.secondary_department)}</p>
+        <p><strong>CV Link:</strong> <a href="${safeHref(registration.cv_link)}">${escHtml(registration.cv_link)}</a></p>
+        ${registration.github_link ? `<p><strong>GitHub:</strong> <a href="${safeHref(registration.github_link)}">${escHtml(registration.github_link)}</a></p>` : ''}
         <p><strong>About Themselves:</strong></p>
-        <p>${registration.about_yourself}</p>
+        <p>${escHtml(registration.about_yourself)}</p>
         ` : ''}
         <hr>
         <p><em>Submitted at ${new Date().toISOString()}</em></p>
@@ -58,7 +74,7 @@ async function sendEmailNotification(registration) {
             body: JSON.stringify({
                 from: 'GDG USTP <noreply@gdgustp.com>',
                 to: ['gdsc@ustp.edu.ph'],
-                subject: `New ${isCoreteam ? 'Core Team' : 'Member'} Registration: ${registration.full_name}`,
+                subject: `New ${isCoreteam ? 'Core Team' : 'Member'} Registration: ${String(registration.full_name ?? '').replace(/[\r\n]+/g, ' ').slice(0, 120)}`,
                 html: emailHtml
             })
         });
@@ -178,13 +194,31 @@ export default async function handler(req, res) {
 
     // GET - fetch registrations (admin only)
     if (req.method === 'GET') {
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
         if (!supabaseAdmin) {
             return res.status(500).json({ error: 'Admin client not configured' });
+        }
+
+        const token = req.headers.authorization?.startsWith('Bearer ')
+            ? req.headers.authorization.substring(7)
+            : null;
+
+        if (!token) {
+            return res.status(401).json({ error: 'Unauthorized - Missing token' });
+        }
+
+        const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+        if (authError || !user) {
+            return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+        }
+
+        const { data: profile, error: profileError } = await supabaseAdmin
+            .from('users')
+            .select('permission')
+            .eq('id', user.id)
+            .single();
+
+        if (profileError || !profile || !['ADMIN', 'SYSTEM', 'EDITOR'].includes(profile.permission)) {
+            return res.status(403).json({ error: 'Forbidden - Insufficient privileges' });
         }
 
         try {
