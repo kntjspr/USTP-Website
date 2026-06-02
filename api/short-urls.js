@@ -104,7 +104,10 @@ export default async function handler(req, res) {
 
                 // validate url
                 try {
-                    new URL(original_url);
+                    const parsed = new URL(original_url);
+                    if (!['http:', 'https:'].includes(parsed.protocol)) {
+                        return res.status(400).json({ error: 'Only http and https URLs are allowed' });
+                    }
                 } catch {
                     return res.status(400).json({ error: 'Invalid URL format' });
                 }
@@ -173,7 +176,10 @@ export default async function handler(req, res) {
 
                 if (original_url !== undefined) {
                     try {
-                        new URL(original_url);
+                        const parsed = new URL(original_url);
+                        if (!['http:', 'https:'].includes(parsed.protocol)) {
+                            return res.status(400).json({ error: 'Only http and https URLs are allowed' });
+                        }
                         updates.original_url = original_url;
                     } catch {
                         return res.status(400).json({ error: 'Invalid URL format' });

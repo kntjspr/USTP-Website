@@ -48,7 +48,15 @@ export default function Redirect() {
                     })
                     .eq('id', data.id);
 
-                // redirect to the original url
+                // redirect to the original url — enforce protocol as defense-in-depth
+                try {
+                    const parsed = new URL(data.original_url);
+                    if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Invalid protocol');
+                } catch {
+                    setError('Invalid redirect destination');
+                    setLoading(false);
+                    return;
+                }
                 window.location.href = data.original_url;
 
             } catch (err) {

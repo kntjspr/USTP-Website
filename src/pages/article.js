@@ -11,6 +11,7 @@ import { FaXTwitter } from 'react-icons/fa6';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { posts, storage } from '../lib/api';
+import DOMPurify from 'dompurify';
 
 export default function Article() {
     const { id } = useParams();
@@ -230,7 +231,7 @@ export default function Article() {
                                             {article.tagline}
                                         </p>
                                     )}
-                                    <div dangerouslySetInnerHTML={{ __html: article.description }} />
+                                    <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.description) }} />
                                 </article>
 
                                 {/* Tags & Share (Mobile) */}
