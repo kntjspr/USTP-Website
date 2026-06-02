@@ -134,14 +134,9 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // Check if API key is configured
     if (!GEMINI_API_KEY) {
         console.error('Gemini API key is not configured');
-        console.error('Environment variables available:', Object.keys(process.env).filter(key => key.includes('GEMINI') || key.includes('API')));
-        return res.status(500).json({
-            error: 'Server configuration error',
-            debug: process.env.NODE_ENV || 'unknown'
-        });
+        return res.status(500).json({ error: 'Server configuration error' });
     }
 
     try {
