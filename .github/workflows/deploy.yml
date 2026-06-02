@@ -1,14 +1,21 @@
 name: Trigger Vercel Deployment
 
 on:
-  push:    # This will trigger the action on every commit (push)
+  push:
     branches:
-      - main  # You can specify which branch to monitor (e.g., "main" or any other branch)
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Trigger Vercel Deploy
-      run: curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_Wlv8UGIoHjqDNr58Y9OaRPDGxg38/ClprZSQmUj"
+      - name: Trigger Vercel Deploy
+        env:
+          DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "VERCEL_DEPLOY_HOOK secret is not configured" >&2
+            exit 1
+          fi
+          curl -sS --fail -X POST "$DEPLOY_HOOK"
