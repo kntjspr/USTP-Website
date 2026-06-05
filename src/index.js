@@ -5,7 +5,6 @@ import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './contexts/AuthContext';
 import './index.css';
-import './tailwind-output.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import Error from './pages/error';
