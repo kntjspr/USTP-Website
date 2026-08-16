@@ -776,14 +776,14 @@ export default function Home() {
                                 </a>
 
                                 {/* 5. Mission Card (Spans 2x1 Wide) */}
-                                <div className="md:col-span-2 bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden group flex flex-col md:flex-row items-center justify-between gap-6">
+                                <div className="md:col-span-2 bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden group flex items-center justify-start min-h-[200px]">
                                     <div className="absolute top-0 right-0 w-48 h-48 bg-white opacity-10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:scale-125 transition-transform duration-700"></div>
-                                    <div className="relative z-10 flex-1">
+                                    <div className="relative z-10 text-left pr-20 md:pr-24 w-full">
                                         <div className="inline-block px-3 py-1 bg-white/20 rounded-full text-xs font-bold mb-4 uppercase tracking-wider">Our Mission</div>
                                         <h3 className="text-3xl font-bold font-google-sans leading-tight">Building Tomorrow's Developers</h3>
                                     </div>
-                                    <div className="relative z-10 flex-shrink-0">
-                                        <Link to="/events" className="inline-flex items-center justify-center w-12 h-12 bg-white/20 hover:bg-white/30 rounded-full transition-colors">
+                                    <div className="absolute right-6 md:right-8 z-10 flex-shrink-0">
+                                        <Link to="/events" className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-white/20 hover:bg-white/30 rounded-full transition-colors">
                                             <span className="text-xl">→</span>
                                         </Link>
                                     </div>
